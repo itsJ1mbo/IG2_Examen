@@ -8,12 +8,14 @@ public:
 
 	void frameRendered(const Ogre::FrameEvent& evt) override;
 	bool keyPressed(const OgreBites::KeyboardEvent& evt) override;
+	bool keyReleased(const OgreBites::KeyboardEvent& evt) override;
 
 private:
 	void createAirplane() const;
 	void createPilot() const;
 	void createRudder() const;
 	void createHelix() const;
+	void createEngineParticle() const;
 
 	IG2Object* _body;
 	IG2Object* _wing1;
@@ -25,5 +27,8 @@ private:
 
 	IG2Object* _helix1;
 	IG2Object* _helix2;
+
+	ParticleSystem* _engine1;
+	ParticleSystem* _engine2;
 };
 

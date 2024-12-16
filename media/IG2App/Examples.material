@@ -1,3 +1,60 @@
+material Examples/Smokes
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+			scene_blend alpha_blend
+			depth_write off
+			diffuse vertexcolour
+
+			texture_unit
+			{
+				texture smoke.png
+				tex_address_mode clamp
+			}
+		}
+	}
+}
+
+material Examples/Airplane
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture BumpyMetal.jpg
+				colour_op modulate
+			}
+
+			texture_unit
+			{
+				texture droplet.png
+				colour_op_ex add src_texture src_current
+				colour_op_multipass_fallback one one
+				env_map spherical
+			}
+		}
+	}
+}
+
+material Examples/Checker
+{
+	technique
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture checker.png
+			}
+		}
+	}
+}
+
 material Examples/SphereMappedRustySteel
 {
 	technique
