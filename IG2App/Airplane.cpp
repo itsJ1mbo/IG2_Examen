@@ -1,5 +1,7 @@
 #include "Airplane.h"
 
+#include <OgreAnimation.h>
+#include <OgreKeyFrame.h>
 #include <OgreParticleSystem.h>
 
 #include "Helix.h"
@@ -14,13 +16,15 @@ Airplane::Airplane(const Vector3& initPos, SceneNode* node, SceneManager* sceneM
 	_helix1(new Helix(initPos, _wing1->createChildSceneNode(), sceneMng, 10)),
 	_helix2(new Helix(initPos, _wing2->createChildSceneNode(), sceneMng, 10)),
 	_engine1(mSM->createParticleSystem("Engine1", "Examples/smokeParticle")),
-	_engine2(mSM->createParticleSystem("Engine2", "Examples/smokeParticle"))
+	_engine2(mSM->createParticleSystem("Engine2", "Examples/smokeParticle")),
+	_animState(nullptr)
 {
 	createAirplane();
 	createPilot();
 	createRudder();
 	createHelix();
 	createEngineParticle();
+	createAnim();
 }
 
 Airplane::~Airplane()
@@ -46,6 +50,7 @@ Airplane::~Airplane()
 
 void Airplane::frameRendered(const Ogre::FrameEvent& evt)
 {
+	_animState->addTime(evt.timeSinceLastFrame);
 }
 
 bool Airplane::keyPressed(const OgreBites::KeyboardEvent& evt)
@@ -128,4 +133,28 @@ void Airplane::createEngineParticle() const
 
 	_engine1->setEmitting(false);
 	_engine2->setEmitting(false);
+}
+
+void Airplane::createAnim()
+{
+	Animation* anim = mSM->createAnimation("AirplaneAnim", 11);
+	anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+	NodeAnimationTrack* track = anim->createNodeTrack(0);
+	track->setAssociatedNode(mNode);
+
+	TransformKeyFrame* key = track->createNodeKeyFrame(0);
+
+	mNode->setInitialState();
+
+	key = track->createNodeKeyFrame(0);
+
+	for (int i = 0; i < 100000; ++i)
+	{
+		key->setTranslate(Vector3(1, 0, 0) * 500 * cos(2 * M_PI / 100000 * i) + Vector3(0, 1, 0) * 500 * sin(2 * M_PI / 100000 * i));
+		key = track->createNodeKeyFrame(i / 10000 + 1);
+	}
+
+	_animState = mSM->createAnimationState("AirplaneAnim");
+	_animState->setEnabled(true);
 }

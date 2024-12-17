@@ -16,6 +16,9 @@ private:
 	void createRudder() const;
 	void createHelix() const;
 	void createEngineParticle() const;
+	void createAnim();
+
+	AnimationState* _animState;
 
 	IG2Object* _body;
 	IG2Object* _wing1;

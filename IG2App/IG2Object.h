@@ -146,6 +146,8 @@ class IG2Object : public OgreBites::InputListener {
         static void addListener(IG2Object* entidad){ appListeners.push_back(entidad); };
 
         void rotate(const Quaternion& q) const;
+
+		SceneNode* node() const { return mNode; }
                         
     protected:
     

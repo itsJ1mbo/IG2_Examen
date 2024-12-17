@@ -1,3 +1,23 @@
+vertex_program VertexExample glsl
+{
+	source VertexExample.glsl
+
+	default_params
+	{
+
+	}
+}
+
+fragment_program FragmentExample glsl
+{
+	source FragmentExample.glsl
+
+	default_params
+	{
+		
+	}
+}
+
 material Examples/Smokes
 {
 	technique
@@ -24,6 +44,14 @@ material Examples/Airplane
 	{
 		pass
 		{
+			vertex_program_ref VertexExample glsl
+			{
+			}
+
+			fragment_program_ref FragmentExample glsl
+			{
+			}
+
 			texture_unit
 			{
 				texture BumpyMetal.jpg
