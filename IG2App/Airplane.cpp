@@ -8,7 +8,7 @@
 
 Airplane::Airplane(const Vector3& initPos, SceneNode* node, SceneManager* sceneMng) :
 	IG2Object(initPos, node, sceneMng),
-	_body(new IG2Object(initPos, createChildSceneNode(), sceneMng, "sphere.mesh")),
+	_body(new IG2Object(initPos, createChildSceneNode(), sceneMng, "uv_sphere.mesh")),
 	_wing1(new IG2Object(initPos, _body->createChildSceneNode(), sceneMng, "cube.mesh")),
 	_wing2(new IG2Object(initPos, _body->createChildSceneNode(), sceneMng, "cube.mesh")),
 	_pilot(new IG2Object(initPos, _body->createChildSceneNode(), sceneMng, "ninja.mesh")),
@@ -17,14 +17,17 @@ Airplane::Airplane(const Vector3& initPos, SceneNode* node, SceneManager* sceneM
 	_helix2(new Helix(initPos, _wing2->createChildSceneNode(), sceneMng, 10)),
 	_engine1(mSM->createParticleSystem("Engine1", "Examples/smokeParticle")),
 	_engine2(mSM->createParticleSystem("Engine2", "Examples/smokeParticle")),
-	_animState(nullptr)
+	_animState(nullptr),
+	_move(false)
 {
 	createAirplane();
 	createPilot();
 	createRudder();
 	createHelix();
+
 	createEngineParticle();
-	createAnim();
+
+	createAnim(10.0f, 100.0f, 500);
 }
 
 Airplane::~Airplane()
@@ -50,29 +53,23 @@ Airplane::~Airplane()
 
 void Airplane::frameRendered(const Ogre::FrameEvent& evt)
 {
-	_animState->addTime(evt.timeSinceLastFrame);
+	if (_move)
+	{
+		_helix1->rotate(Quaternion(Degree(5), Vector3(0, 1, 0)));
+		_helix2->rotate(Quaternion(Degree(5), Vector3(0, 1, 0)));
+
+		_animState->addTime(evt.timeSinceLastFrame);
+	}
 }
 
 bool Airplane::keyPressed(const OgreBites::KeyboardEvent& evt)
 {
 	if (evt.keysym.sym == SDLK_w)
 	{
-		_helix1->rotate(Quaternion(Degree(5), Vector3(0, 1, 0)));
-		_helix2->rotate(Quaternion(Degree(5), Vector3(0, 1, 0)));
+		_move = !_move;
 
-		_engine1->setEmitting(true);
-		_engine2->setEmitting(true);
-	}
-
-	return true;
-}
-
-bool Airplane::keyReleased(const OgreBites::KeyboardEvent& evt)
-{
-	if (evt.keysym.sym == SDLK_w)
-	{
-		_engine1->setEmitting(false);
-		_engine2->setEmitting(false);
+		_engine1->setEmitting(_move);
+		_engine2->setEmitting(_move);
 	}
 
 	return true;
@@ -80,7 +77,7 @@ bool Airplane::keyReleased(const OgreBites::KeyboardEvent& evt)
 
 void Airplane::createAirplane() const
 {
-	_body->setMaterialName("Examples/Airplane");
+	_body->setMaterialName("Examples/shaderOrange");
 	_body->setScale(Vector3(10, 2, 2));
 
 	_wing1->setScale(Vector3(0.5, 0.25, 1));
@@ -135,24 +132,29 @@ void Airplane::createEngineParticle() const
 	_engine2->setEmitting(false);
 }
 
-void Airplane::createAnim()
+void Airplane::createAnim(const float t, const float keyFrames, const int r)
 {
-	Animation* anim = mSM->createAnimation("AirplaneAnim", 11);
+	Animation* anim = mSM->createAnimation("AirplaneAnim", t);
 	anim->setInterpolationMode(Ogre::Animation::IM_SPLINE);
 
 	NodeAnimationTrack* track = anim->createNodeTrack(0);
 	track->setAssociatedNode(mNode);
 
-	TransformKeyFrame* key = track->createNodeKeyFrame(0);
+	TransformKeyFrame* key;
 
 	mNode->setInitialState();
 
-	key = track->createNodeKeyFrame(0);
-
-	for (int i = 0; i < 100000; ++i)
+	for (int i = 0; i < keyFrames; ++i)
 	{
-		key->setTranslate(Vector3(1, 0, 0) * 500 * cos(2 * M_PI / 100000 * i) + Vector3(0, 1, 0) * 500 * sin(2 * M_PI / 100000 * i));
-		key = track->createNodeKeyFrame(i / 10000 + 1);
+		key = track->createNodeKeyFrame(i * (t / keyFrames));
+
+		const float angle = Math::TWO_PI / keyFrames * i;
+
+		key->setTranslate(Vector3(1, 0, 0) * r * cos(angle) + Vector3(0, 1, 0) * r * sin(angle));
+
+		const float tangent = angle - Math::HALF_PI;
+		Quaternion rotation = Quaternion(Radian(tangent), Vector3::UNIT_Z);
+		key->setRotation(rotation);
 	}
 
 	_animState = mSM->createAnimationState("AirplaneAnim");

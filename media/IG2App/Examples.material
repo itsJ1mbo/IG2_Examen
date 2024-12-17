@@ -4,17 +4,74 @@ vertex_program VertexExample glsl
 
 	default_params
 	{
-
+		param_named_auto modelViewProjMat worldviewproj_matrix
 	}
 }
 
 fragment_program FragmentExample glsl
 {
 	source FragmentExample.glsl
+}
+
+material Examples/shaderOrange
+{
+	technique
+	{
+		pass
+		{
+			vertex_program_ref VertexExample{}
+
+			fragment_program_ref FragmentExample{}
+		}
+	}
+}
+
+vertex_program VertexSky glsl
+{
+	source VertexSky.glsl
 
 	default_params
 	{
-		
+		param_named_auto modelViewProjMat worldviewproj_matrix
+	}
+}
+
+fragment_program FragmentSky glsl
+{
+	source FragmentSky.glsl
+
+	default_params
+	{
+		param_named text0 int 0;
+		param_named text1 int 1;
+	}
+}
+
+material Examples/shaderSky
+{
+	technique
+	{
+		pass
+		{
+			lighting off
+
+			vertex_program_ref VertexSky{}
+
+			fragment_program_ref FragmentSky{}
+
+			texture_unit
+			{
+				
+				texture spaceSky.jpg 2d
+				tex_address_mode clamp
+			}
+
+			texture_unit
+			{
+				texture lightMap.jpg 2d
+				tex_address_mode clamp
+			}
+		}
 	}
 }
 
@@ -44,14 +101,6 @@ material Examples/Airplane
 	{
 		pass
 		{
-			vertex_program_ref VertexExample glsl
-			{
-			}
-
-			fragment_program_ref FragmentExample glsl
-			{
-			}
-
 			texture_unit
 			{
 				texture BumpyMetal.jpg
@@ -69,15 +118,55 @@ material Examples/Airplane
 	}
 }
 
+vertex_program VertexChecker glsl
+{
+	source VertexChecker.glsl
+
+	default_params
+	{
+		param_named_auto modelViewProjMat worldviewproj_matrix
+	}
+}
+
+fragment_program FragmentChecker glsl
+{
+	source FragmentChecker.glsl
+
+	default_params
+	{
+		param_named text0 int 0;
+		param_named text1 int 1;
+		param_named text2 int 2;
+	}
+}
+
 material Examples/Checker
 {
 	technique
 	{
 		pass
 		{
+			cull_software none
+			cull_hardware none
+
+			vertex_program_ref VertexChecker{}
+
+			fragment_program_ref FragmentChecker{}
+
 			texture_unit
 			{
 				texture checker.png
+				tex_address_mode clamp 
+			}
+			texture_unit
+			{
+				texture BumpyMetal.jpg
+				tex_address_mode clamp 
+			}
+			texture_unit
+			{
+				texture waveNM.png
+				tex_address_mode clamp 
 			}
 		}
 	}

@@ -105,6 +105,12 @@ void IG2App::setupScene(void){
     //------------------------------------------------------------------------
     //
 
+    Ogre::Plane plane;
+	plane.d = 1000;
+	plane.normal = Ogre::Vector3::UNIT_Z;
+
+    mSM->setSkyPlane(true, plane, "Examples/shaderSky", 40, 1);
+
 	SceneNode* node = mSM->getRootSceneNode()->createChildSceneNode();
     IG2Object* helix = new Airplane(Vector3(0, 0, 0), node, mSM);
     addInputListener(helix);

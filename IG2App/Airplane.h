@@ -8,7 +8,6 @@ public:
 
 	void frameRendered(const Ogre::FrameEvent& evt) override;
 	bool keyPressed(const OgreBites::KeyboardEvent& evt) override;
-	bool keyReleased(const OgreBites::KeyboardEvent& evt) override;
 
 private:
 	void createAirplane() const;
@@ -16,7 +15,7 @@ private:
 	void createRudder() const;
 	void createHelix() const;
 	void createEngineParticle() const;
-	void createAnim();
+	void createAnim(float t, float keyFrames, int r);
 
 	AnimationState* _animState;
 
@@ -33,5 +32,7 @@ private:
 
 	ParticleSystem* _engine1;
 	ParticleSystem* _engine2;
+
+	bool _move;
 };
 
